@@ -12,14 +12,15 @@ def ballDelta = ballDeltaBase + random(ballDeltaBase)
 val ballSize = 20
 
 val ballE = penColor(Color(18, 0, 0)) * trans(ballSize, ballSize) -> PicShape.circle(ballSize)
-val ballImg1 = PicShape.image("/media/collidium/ball1.png", ballE)
-val ballImg2 = PicShape.image("/media/collidium/ball2.png", ballE)
-val ballImg3 = PicShape.image("/media/collidium/ball3.png", ballE)
-val ballImg4 = PicShape.image("/media/collidium/ball4.png", ballE)
 
-def makeBall(position: (Double, Double)): Picture = 
+
+def makeBall(position: (Double, Double)): Picture = {
+  val ballImg1 = PicShape.image("/media/collidium/ball1.png", ballE)
+  val ballImg2 = PicShape.image("/media/collidium/ball2.png", ballE)
+  val ballImg3 = PicShape.image("/media/collidium/ball3.png", ballE)
+  val ballImg4 = PicShape.image("/media/collidium/ball4.png", ballE)
   trans(position._1, position._2) -> picBatch(ballImg1, ballImg2, ballImg3, ballImg4)
-
+}
 
 val ball =
     makeBall((cb.x + ballDelta, cb.y + ballDelta))

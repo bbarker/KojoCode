@@ -1,7 +1,8 @@
-// Sling the ball (with the mouse) towards the target on the top-right. 
-// Then draw paddles on the canvas (with the mouse) to guide the ball 
-// away from the obstacles and towards the target.
-// You win if you hit the target within a minute
+//TODO:
+// 1. make multiple balls work (move)
+// 2. be able to move a ball with the cursor
+
+
 switchToDefault2Perspective()
 cleari()
 drawStage(darkGray)
@@ -175,10 +176,11 @@ def manageGameTime() {
         gameTime += 1
         timeLabel.update(gameTime)
 
-        if (gameTime == 60) {
-            drawMessage("Time up! You Lose", red)
-            stopAnimation()
-        }
+// TODO: Maybe for challenge mode?
+//        if (gameTime == ) {
+//            drawMessage("Time up! You Lose", red)
+//            stopAnimation()
+//        }
     }
 }
 

@@ -1,7 +1,9 @@
 //TODO:
+// 0. Register balls in a structure (kd-tree)
 // 1. make multiple balls work (move)
 // 2. be able to move a ball with the cursor
-
+// 3. make them connect using spring physics
+// 4. Add gravity
 
 switchToDefault2Perspective()
 cleari()
@@ -12,15 +14,27 @@ val ballDeltaBase = (obsDelta / 4).toInt
 def ballDelta = ballDeltaBase + random(ballDeltaBase)
 val ballSize = 20
 
+class RenderProperties {
+    var hidden: Boolean = false
+}
+
 val ballE = penColor(Color(18, 0, 0)) * trans(ballSize, ballSize) -> PicShape.circle(ballSize)
 
+abstract class Entity(val pic: Picture, val rprops: RenderProperties)
+case class Ball(override val pic: Picture, override val rprops: RenderProperties)
+extends Entity(pic, rprops)
 
-def makeBall(position: (Double, Double)): Picture = {
-  val ballImg1 = PicShape.image("/media/collidium/ball1.png", ballE)
-  val ballImg2 = PicShape.image("/media/collidium/ball2.png", ballE)
-  val ballImg3 = PicShape.image("/media/collidium/ball3.png", ballE)
-  val ballImg4 = PicShape.image("/media/collidium/ball4.png", ballE)
-  trans(position._1, position._2) -> picBatch(ballImg1, ballImg2, ballImg3, ballImg4)
+
+def makeBall(position: (Double, Double)): Ball = {
+    val ballImg1 = PicShape.image("/media/collidium/ball1.png", ballE)
+    val ballImg2 = PicShape.image("/media/collidium/ball2.png", ballE)
+    val ballImg3 = PicShape.image("/media/collidium/ball3.png", ballE)
+    val ballImg4 = PicShape.image("/media/collidium/ball4.png", ballE)
+    Ball(
+        trans(position._1, position._2) -> 
+            picBatch(ballImg1, ballImg2, ballImg3, ballImg4),
+        new RenderProperties()
+    )
 }
 
 val ball =
@@ -38,7 +52,9 @@ val obstacles = (1 to 3).map { n =>
     trans(cb.x + n * obsDelta, cb.y + cb.height / 4) * fillColor(wallTexture) * penColor(noColor) -> PicShape.rect(cb.height / 2, 12)
 }
 
-draw(ball, ball2, target)
+drawEntity(ball)
+drawEntity(ball2) 
+draw(target)
 drawAndHide(ballE)
 obstacles.foreach { o => draw(o) }
 playMp3Sound("/media/collidium/hit.mp3")
@@ -71,8 +87,8 @@ val slingPts = ArrayBuffer.empty[Point]
 var sling = PicShape.hline(1)
 var paddle = PicShape.hline(1)
 var tempPaddle = paddle
-drawAndHide(paddle)
-ball.onMousePress { (x, y) =>
+draw(paddle)
+ball.pic.onMousePress { (x, y) =>
     slingPts += Point(ball.position.x + ballSize, ball.position.y + ballSize)
 }
 
@@ -160,6 +176,10 @@ stageArea.onMouseRelease { (x, y) =>
 target.forwardInputTo(stageArea)
 obstacles.foreach { o => o.forwardInputTo(stageArea) }
 
+def drawEntity(ent: Entity): Unit = 
+    if (!ent.rprops.hidden) { 
+        draw(ent.pic)
+    }
 def drawMessage(m: String, c: Color) {
     val te = textExtent(m, 30)
     val pic = penColor(c) * trans(cb.x + (cb.width - te.width) / 2, 0) -> PicShape.text(m, 30)
